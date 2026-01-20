@@ -3,70 +3,119 @@ import time
 import pandas as pd
 from shah_armor import ShahArmor
 
-# --- Initialize Shah Armor ---
+# --- INITIALIZE SHAH ARMOR ---
+# This checks for debuggers/VMs immediately
 armor = ShahArmor()
 
-st.set_page_config(page_title="Shah Armor | FTR Predictor", layout="wide")
+# --- PAGE CONFIGURATION ---
+st.set_page_config(
+    page_title="Shah Armor | Neural Vault", 
+    page_icon="🛡️", 
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-# Owner Branding
-st.markdown(f"<p style='text-align: right; color: #666;'>{armor.get_stamp()}</p>", unsafe_allow_html=True)
+# Custom CSS for a Professional "Cyber" Look
+st.markdown("""
+    <style>
+    .main { background-color: #0e1117; color: #ffffff; }
+    .stMetric { background-color: #1a1c24; padding: 15px; border-radius: 10px; border: 1px solid #4CAF50; }
+    </style>
+    """, unsafe_allow_html=True)
 
-# Main Header
-st.title("🛡️ Shah Armor: Quantum-Resilient Predictor")
-st.markdown("---")
+# --- SIDEBAR & AUTHENTICATION ---
+with st.sidebar:
+    st.image("https://img.icons8.com/color/96/000000/shield.png", width=80)
+    st.title("Shah Armor Admin")
+    st.write(f"Owner: **{armor.owner}**")
+    st.markdown("---")
+    
+    user_key = st.text_input("🔑 License Access Key", type="password")
+    
+    st.markdown("---")
+    st.info(f"Support: {armor.contact}")
 
-# User Authentication
-st.sidebar.header("🔑 Authentication")
-user_key = st.sidebar.text_input("Enter Shah Armor License Key", type="password")
-
+# --- MAIN LOGIC GATE ---
 if user_key == st.secrets["VALID_KEY"]:
-    st.sidebar.success(f"Verified Access: {armor.owner}")
     
-    # User Instructions Panel
-    with st.expander("ℹ️ How it works & What you will see"):
-        st.write("""
-        1. **Encryption Layer:** Your data is processed through the **Shah Armor** Neural Vault.
-        2. **FTR Engine:** The system calculates **Fractal Temporal Resonance** to find hidden patterns.
-        3. **Coherence Score:** This shows the mathematical 'tightness' of the prediction.
-        4. **Secure Wipe:** Once the result is shown, the transient memory is zeroed for your security.
-        """)
+    # NAVIGATION TABS
+    tab1, tab2, tab3 = st.tabs(["📈 FTR Predictor", "🔒 Black Box Service", "📜 About Shah Armor"])
 
-    # Main Interface
-    col1, col2 = st.columns([1, 1])
-    
-    with col1:
-        st.subheader("📈 Data Input")
-        val_input = st.text_area("Paste your chaotic signal (comma separated):", "1.5, 2.3, 1.8, 3.1, 2.9")
+    # --- TAB 1: FTR PREDICTOR (Your Product) ---
+    with tab1:
+        st.header("Fractal Temporal Resonance Engine")
+        st.write("Analyze chaotic data streams with Quantum-resilient math.")
         
-        if st.button("🚀 Execute Shah Armor Analysis"):
-            import engine
-            try:
-                data = [float(x.strip()) for x in val_input.split(",")]
-                
-                with st.status("Analyzing via Shah Armor Protocol...", expanded=True) as status:
-                    st.write("Initializing Quantum Noise Injection...")
-                    time.sleep(0.5)
-                    st.write("Solving Fractal Resonance Equations...")
-                    res = engine.predict_next(data)
-                    time.sleep(0.5)
-                    status.update(label="Analysis Complete!", state="complete", expanded=False)
-                
-                # Big Result Display
-                st.success("Analysis Successful")
-                st.metric(label="Shah Armor Prediction", value=res['prediction'])
-                st.progress(res['coherence_index'] / 100, text=f"Mathematical Coherence: {res['coherence_index']}%")
-                
-            except ValueError:
-                st.error("Invalid Input: Please ensure you only enter numbers separated by commas.")
+        col_input, col_viz = st.columns([1, 1])
+        
+        with col_input:
+            data_str = st.text_area("Input Stream (Comma Separated Values)", "10.5, 12.1, 11.8, 13.4, 12.9")
+            if st.button("Run Resonance Analysis"):
+                import engine
+                try:
+                    data = [float(x.strip()) for x in data_str.split(",")]
+                    with st.status("Solving Fractal Equations...", expanded=False):
+                        prediction = engine.predict_next(data)
+                        time.sleep(1)
+                    
+                    st.metric("Predicted Value", prediction['prediction'])
+                    st.progress(prediction['coherence_index']/100, text=f"Coherence: {prediction['coherence_index']}%")
+                except Exception as e:
+                    st.error("Data Format Error: Use numbers separated by commas.")
 
-    with col2:
-        st.subheader("🔍 Visual Validation")
-        if 'res' in locals():
-            # Create a simple trend chart for the user
-            chart_data = pd.DataFrame(data, columns=["Signal Value"])
-            st.line_chart(chart_data)
-            st.caption("The graph above shows the input signal density before FTR processing.")
+        with col_viz:
+            if 'data' in locals():
+                st.line_chart(pd.DataFrame(data, columns=["Signal"]))
+                st.caption("Visualizing input frequency before FTR processing.")
+
+    # --- TAB 2: BLACK BOX SERVICE (Your New Business) ---
+    with tab2:
+        st.header("Shah Armor: Black Box Wrapping")
+        st.subheader("Turn your Python IP into an unbreakable Binary Vault.")
+        
+        st.markdown("""
+        **What happens when you submit?**
+        1. We inject **Sentinel Melt Protocols** into your logic.
+        2. We compile your code into a **C-Binary (.pyd/.so)**.
+        3. We add a **Hardware ID Lock** so it only runs on authorized PCs.
+        """)
+        
+        with st.form("protection_form"):
+            client_name = st.text_input("Your Name / Company")
+            client_email = st.text_input("Email for Delivery")
+            uploaded_code = st.file_uploader("Upload your Python Script (.py)", type="py")
+            security_level = st.select_slider("Select Protection Level", options=["Standard", "High", "Melt-On-Sight"])
+            
+            submit_btn = st.form_submit_button("Request Black Box Quote")
+            
+            if submit_btn and uploaded_code:
+                st.success(f"File '{uploaded_code.name}' received! Shanawaz Khan will contact you at {client_email} with the secure binary.")
+                # Note: In a real app, you would use an email API (like SendGrid) here to notify you.
+
+    # --- TAB 3: ABOUT & COMPETITORS ---
+    with tab3:
+        st.header("Intelligence Report")
+        
+        col_a, col_b = st.columns(2)
+        with col_a:
+            st.write("**What we created:**")
+            st.write("- **Self-Healing Logic:** Code deletes itself if debugged.")
+            st.write("- **BCC Compilation:** Pure machine code execution.")
+            st.write("- **Zero-Trace Memory:** Memory is wiped after calculation.")
+        
+        with col_b:
+            st.write("**Competitive Edge:**")
+            st.table({
+                "Feature": ["Melt Protocol", "VM Detection", "Identity Stamp"],
+                "Shah Armor": ["✅ Yes", "✅ Yes", "✅ Yes"],
+                "Competitors": ["❌ No", "⚠️ Partial", "❌ No"]
+            })
 
 else:
-    st.warning("Locked. Please provide a valid Shah Armor Key to unlock this engine.")
-    st.info("For support, contact: tenor9777@gmail.com")
+    # ACCESS DENIED SCREEN
+    st.warning("🛡️ SHAH ARMOR: System is currently in Vault Mode.")
+    st.image("https://img.icons8.com/ios-filled/100/4CAF50/lock.png")
+    st.write("Please enter your authorized license key in the sidebar to wake the engine.")
+    
+    with st.expander("New to Shah Armor?"):
+        st.write(f"Shah Armor is a proprietary security layer for high-performance Python code. To purchase a key or protect your own code, contact **{armor.owner}** at **{armor.contact}**.")
